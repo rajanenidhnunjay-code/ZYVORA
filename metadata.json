@@ -1,0 +1,6 @@
+{
+  "name": "Zyvora Agency",
+  "description": "A clean, minimal, and elegant one-page portfolio website for Zyvora Agency, a premier web design studio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
