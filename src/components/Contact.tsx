@@ -27,39 +27,43 @@ export default function Contact() {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !msg) return;
-
-    const formData = new FormData();
-    formData.append("access_key", "82b70154-6cd2-4880-97e9-e1b10f2b24a3");
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("message", msg);
+    if (!name || !email || !msg) {
+      alert("Please fill out all fields before starting a project.");
+      return;
+    }
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        body: formData
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          
+          access_key: "82b70154-6cd2-4880-97e9-e1b10f2b24a3", 
+          subject: `🚀 New Project Request from ${name}`,
+          name: name,
+          email: email,
+          message: msg,
+          timestamp: new Date().toLocaleString()
+        }),
       });
-      
-      const data = await response.json();
 
-      if (data.success) {
+      const result = await response.json();
+      if (result.success) {
         setFormSubmitted(true);
-        setTimeout(() => {
-          setFormSubmitted(false);
-          setName('');
-          setEmail('');
-          setMsg('');
-        }, 4500);
+        setName('');
+        setEmail('');
+        setMsg('');
       } else {
-        alert("Something went wrong. Please try again.");
+        alert("Something went wrong with Web3Forms. Please try again.");
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("Network error. Please try again later.");
+      console.error("Error sending form:", error);
+      alert("Failed to send information. Please check your connection.");
     }
   };
-
   return (
     <section id="contact" className="py-24 sm:py-32 bg-white dark:bg-neutral-900 px-6">
       <div className="absolute left-1/4 bottom-0 w-80 h-80 bg-neutral-200/50 dark:bg-neutral-800/30 blur-3xl rounded-full -z-10" />
