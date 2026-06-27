@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
 import { Phone, User, Send, Compass, MapPin, Mail, ArrowUpRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react'; // <-- Changed this line
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function Contact() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -10,7 +11,7 @@ export default function Contact() {
 
   const founders = [
     {
-      name: "THOTA CHINNA LAKSHMI NARSHIMHA NAIDU",
+      name: "THOTA CHINNA LAXMI NARSHIMHA NAIDU",
       role: 'Founder',
       phone: '79894 38641',
       rawPhone: '+917989438641',
@@ -33,6 +34,7 @@ export default function Contact() {
     }
 
     try {
+      // 1. Web3Forms submission (keeps your email alerts active)
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: {
@@ -40,8 +42,7 @@ export default function Contact() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          
-          access_key: "82b70154-6cd2-4880-97e9-e1b10f2b24a3", 
+          access_key: "82b70154-6cd2-4880-97e9-e1b10f2b24a3",
           subject: `🚀 New Project Request from ${name}`,
           name: name,
           email: email,
@@ -50,10 +51,21 @@ export default function Contact() {
         }),
       });
 
+      // 2. Supabase submission (saves data directly to your table database)
+      const { error: supabaseError } = await supabase
+        .from('leads')
+        .insert([
+          { client_email: email, client_message: msg }
+        ]);
+
+      if (supabaseError) {
+        console.error("Supabase storage error:", supabaseError.message);
+      }
+
       const result = await response.json();
       if (result.success) {
         setFormSubmitted(true);
-        setName('');
+        // Clear message fields but keep the name intact so the success message renders properly
         setEmail('');
         setMsg('');
       } else {
@@ -64,6 +76,7 @@ export default function Contact() {
       alert("Failed to send information. Please check your connection.");
     }
   };
+
   return (
     <section id="contact" className="py-24 sm:py-32 bg-white dark:bg-neutral-900 px-6">
       <div className="absolute left-1/4 bottom-0 w-80 h-80 bg-neutral-200/50 dark:bg-neutral-800/30 blur-3xl rounded-full -z-10" />
